@@ -1,0 +1,568 @@
+@import url("../styles/globals.css");
+
+.educational_container,
+.entertainment_container {
+  position: relative;
+  /* padding: 1rem; */
+}
+.linksblurred {
+  position: relative;
+  filter: blur(2px);
+  z-index: -99;
+}
+.link_list {
+  list-style-type: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  /* position: relative; */
+
+  z-index: -10;
+  gap: 0.8rem;
+  /* width: 396px; */
+  height: 5rem;
+  overflow-y: scroll;
+  padding: 0.3rem;
+  margin-bottom: 0.8rem;
+}
+
+.add_link_style {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20%;
+  gap: 0.3rem;
+  background-color: var(--accent);
+  color: var(--text-color-dark);
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  transition: all 0.3 ease-in;
+}
+.add_link_style:hover {
+  opacity: 0.8;
+  /* /* border: 1px solid var(--accent); */
+  /* background-color: transparent; */
+  scale: 0.9;
+  /* color: var(--accent); */
+}
+.addlinkicon {
+  padding-top: 0.09rem;
+}
+.activity_link_add {
+  position: absolute;
+  top: 30%;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+  width: 90%;
+}
+.activity_link_add > input {
+  width: auto;
+  padding: 0.4rem;
+  border-radius: 0.2rem;
+  border: 1px solid var(--accent);
+  z-index: 99;
+}
+.link_url {
+  flex: 2;
+}
+.activity_link_add > input:focus {
+  outline: 2px var(--accent);
+  scale: 1.03;
+}
+.link_list::-webkit-scrollbar {
+  width: 2px;
+}
+
+.link_list::-webkit-scrollbar-thumb {
+  background-color: var(--color-extra);
+
+  border-radius: 4px;
+}
+.link_list::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+.link_list::-webkit-scrollbar-track {
+  background-color: var(--accent);
+}
+.link_item {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  align-items: center;
+  list-style-type: none;
+  padding: 0.3rem 0.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.3px 2px var(--highlight);
+}
+.link_label {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.link_label a {
+  color: gray;
+}
+.link_label:hover a {
+  color: var(--accent);
+}
+.delete_icon {
+  background-color: crimson;
+  padding: 0.3rem;
+  color: var(--text-color-dark);
+  border-radius: 0.3rem;
+  font-size: small;
+}
+.delete_icon:hover {
+  scale: 0.9;
+}
+.link_type_icon {
+  padding-top: 0.3rem;
+}
+
+@media (max-width: 728px) {
+  .activity_link_add {
+    flex-direction: column;
+    top: 25%;
+  }
+  .add_link_style {
+    width: 40%;
+  }
+}
+
+/*  */
+.iframe_container {
+  position: relative;
+  width: 100%;
+  height: 80vh;
+  margin-top: 1rem;
+}
+
+.iframe_viewer {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}
+
+.close_iframe {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: crimson;
+  color: white;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+/*  */
+
+/* .activities_container {
+  /* padding: 1rem; */
+/* background-color: #f9f9f9; */
+/* border: 1px solid var(--accent); */
+
+.activity_description {
+  display: flex;
+  gap: 0.2rem;
+  /* justify-content: space-between; */
+  /* background-color: var(--color-extra); */
+  /* padding: 0.5rem; */
+  /* align-items: center; */
+  flex-direction: column;
+  border-radius: 0.5rem;
+}
+
+.activity_description p {
+  font-size: small;
+  font-style: italic;
+  opacity: 0.5;
+}
+.tabs {
+  display: flex;
+  gap: 1rem;
+}
+
+.tabs button {
+  flex: 1;
+  padding: 12px;
+  background: transparent;
+  font-weight: bold;
+  color: var(--accent);
+  cursor: pointer;
+  border-radius: 0.75rem;
+  border: 1px solid var(--accent);
+  transition: scale 0.2s ease-in-out;
+  /* border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem; */
+}
+.tabs button:hover {
+  box-shadow: 0px 1px 5px rgb(130, 128, 128);
+  scale: 0.95;
+}
+.tabs button.active-tab {
+  background: var(--accent);
+  color: var(--text-color-dark);
+}
+
+.tab_content {
+  padding: 20px;
+}
+
+/* .links_section,
+.shortcuts_section {
+  margin-bottom: 20px;
+} */
+
+/* 
+.shortcut {
+  width: 60px;
+  text-align: center;
+}
+
+.shortcut img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/*  */
+.educational_label,
+.entertainment_label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.8rem;
+  /* align-items: center; */
+}
+
+.activities_add_styles {
+  color: var(--accent);
+  height: 24px;
+  width: 24px;
+  cursor: pointer;
+}
+.activities_add_styles:hover {
+  scale: 0.9;
+}
+.activities_add_shortucts {
+  height: 48px;
+  width: 48px;
+  color: var(--accent);
+}
+.shortcut_tab {
+  padding: 1rem;
+}
+
+/* General container for shortcuts */
+.shortcut_section {
+  position: relative;
+  /* padding: 1rem; */
+  overflow-x: hidden;
+}
+
+.shortcut_grid {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+  /* overflow-x: auto; */
+  margin-top: 1rem;
+  align-items: center;
+  /* padding: 0.5rem; */
+}
+
+/* Shortcut Item Style */
+.shortcut_item {
+  display: flex;
+  flex-direction: column;
+  /* gap: 0.3rem; */
+  overflow-x: hidden;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 80px;
+  height: 80px;
+  padding: 0.2rem;
+  background: transparent;
+  text-transform: capitalize;
+  border: 1px solid var(--color-extra);
+  border-radius: 10px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.shortcut_item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(117, 201, 166, 0.3);
+}
+
+.shortcut_item a {
+  text-decoration: none;
+  /* color: var(--color-extra); */
+  color: var(--accent);
+}
+.shortcut_icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--color-extra);
+  border-radius: 50%;
+  margin-bottom: 8px;
+}
+
+.shortcut_icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.shortcut_name {
+  font-size: 14px;
+  font-weight: 500;
+  /* color: var(--pastel-text); */
+  word-wrap: break-word;
+  margin-top: 4px;
+}
+
+/* Delete Icon */
+.shortcuts_delete_icon {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-size: 14px;
+  color: crimson;
+  cursor: pointer;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.shortcuts_delete_icon:hover {
+  color: darkred;
+  transform: scale(1.1);
+}
+
+/* Add Shortcut Tab */
+.shortcut_tab {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 60px;
+  height: 60px;
+  background: transparent;
+  border: 2px dashed var(--highlight);
+  color: var(--accent);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.shortcut_tab:hover {
+  background: var(--highlight);
+  color: white;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Shortcut Form */
+.shortcut_form {
+  margin-top: 1rem;
+  position: absolute;
+  top: 30px;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  /* background: white; */
+  padding: 1rem;
+  /* border: 1px solid var(--color-extra); */
+  border-radius: 6px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  /* flex-direction: column; */
+  overflow: hidden;
+  gap: 0.8rem;
+}
+.shortcut_form_input,
+.shortcut_form_btns {
+  display: flex;
+  /* flex-direction: column; */
+  gap: 0.8rem;
+  align-items: center;
+  margin: 5px 0;
+}
+.shortcut_form_input p {
+  font-style: italic;
+  font-size: small;
+  opacity: 0.8;
+  /* color: var(--text-color-light); */
+}
+.shortcut_form input {
+  padding: 0.5rem;
+  font-size: 14px;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+}
+
+.shortcut_form .submit {
+  padding: 0.5rem 1rem;
+  background: var(--accent);
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.shortcut_form .submit:hover {
+  background: var(--highlight);
+}
+
+/* Scrollbar Customization */
+.shortcut_grid::-webkit-scrollbar {
+  height: 4px;
+}
+
+.shortcut_grid::-webkit-scrollbar-thumb {
+  background-color: var(--color-extra);
+  border-radius: 2px;
+}
+
+.shortcut_grid::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+.shortcut_grid::-webkit-scrollbar-track {
+  background-color: #f0f0f0;
+}
+
+/* Input Section */
+.shortcut_link_add {
+  position: absolute;
+  top: 50px;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.shortcut_link_add > input {
+  flex: 1;
+  padding: 0.4rem;
+  border-radius: 4px;
+  border: 1px solid var(--accent);
+}
+
+.shortcut_link_add > input:focus {
+  outline: 2px var(--accent);
+  transform: scale(1.02);
+}
+
+.link_url {
+  flex: 2;
+}
+
+.file_input {
+  display: none;
+}
+
+.file_input_label {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: var(--color-extra);
+  color: var(--pastel-text);
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.3s ease-in-out;
+}
+
+.file_input_label:hover {
+  background: var(--highlight);
+  color: var(--primary-color-light);
+}
+.cancel_button {
+  padding: 0.5rem 1rem;
+  background: transparent;
+  color: var(--accent);
+  font-size: 14px;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.cancel_button:hover {
+  background: transparent;
+  border: 1px solid crimson;
+  color: crimson;
+}
+
+.shortcut_locked {
+  /* display: flex;
+  justify-content: center;
+  align-items: center;*/
+  width: 120px;
+  height: 80px;
+  /* background: rgba(200, 200, 200, 0.5); */
+  border: 1px dashed gray;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 12px;
+  color: gray;
+  cursor: not-allowed;
+}
+
+.shortcut_locked p {
+  margin: 0;
+  padding: 0.5rem;
+}
+
+.preset_icon_grid {
+  display: flex;
+  flex-direction: column;
+
+  background-color: var(--color-extra);
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.preset_icon {
+  width: 40px;
+  height: 40px;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.preset_icon:hover {
+  border-color: var(--accent);
+}
+
+.preset_icon.selected {
+  border-color: var(--accent);
+}
+.toggle_icons_button {
+  display: inline-block;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-bottom: 10px;
+  transition: background-color 0.3s;
+}
+
+.toggle_icons_button:hover {
+  background-color: #0056b3;
+}

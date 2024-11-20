@@ -1,0 +1,114 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap");
+/*  */
+
+* {
+  margin: 0;
+  padding: 0;
+}
+:root {
+  --primary-color-light: #ffffff;
+  --primary-color-dark: #212529;
+  --secondary-color-light: #1c170d;
+  --text-color-light: #1c170d;
+  --text-color-dark: #ffffff;
+  --color-extra: #f5f0e5;
+  --accent: #009963;
+  --highlight: #90c2a7;
+  /*  */
+
+  --color-pastel: #80ed99;
+  --pastel-text: #353535;
+}
+
+.container {
+  width: 90%;
+  margin: 0 auto;
+}
+/*  */
+.theme_dark {
+  background-color: var(--primary-color-dark);
+  color: var(--text-color-dark);
+}
+
+.theme_light {
+  background-color: var(--primary-color-light);
+  color: var(--text-color-light);
+}
+
+.theme_pastel {
+  background-color: var(--color-pastel);
+  color: var(--pastel-text);
+}
+/*  */
+.default_font {
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+.font_arial {
+  font-family: Arial, Helvetica, sans-serif;
+}
+.font_courier {
+  font-family: "Courier New", Courier, monospace;
+}
+.font_mono {
+  font-family: monospace;
+}
+.font_timesnew {
+  font-family: "Times New Roman", Times, serif;
+}
+/*  */
+h1 {
+  height: 32px;
+  line-height: 40px;
+}
+
+h4 {
+  height: 18px;
+  line-height: 23px;
+}
+p {
+  height: 16px;
+  line-height: 24px;
+}
+
+.icons {
+  width: 16px;
+  height: 16px;
+}
+.add_icon {
+  width: 22px;
+  height: 22px;
+  padding-top: 0.5rem;
+}
+.add_icon:hover {
+  scale: 1.09;
+  color: var(--accent);
+}
+.add_icon:active {
+  opacity: 0.7;
+}
+
+/*  */
+@media (max-width: 728px) {
+  .add_icon {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/*  */
+body::-webkit-scrollbar {
+  width: 5px;
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: var(--accent);
+
+  border-radius: 4px;
+}
+body::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+body::-webkit-scrollbar-track {
+  background-color: var(--color-extra);
+}

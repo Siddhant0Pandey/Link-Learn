@@ -1,0 +1,24 @@
+@import url("../styles/globals.css");
+
+.quote_container {
+  display: flex;
+  /* flex-wrap: wrap; */
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.quote_heading {
+  opacity: 0.7;
+}
+.quote_text {
+  color: #2f3e46;
+  opacity: 0.8;
+  width: 380px;
+  height: 12px;
+  text-align: center;
+  word-spacing: 2px;
+}
+.quote_author {
+  opacity: 0.9;
+  font-size: small;
+  text-align: right;
+}

@@ -1,0 +1,37 @@
+@import url("../styles/globals.css");
+
+.achievement_tab {
+  height: 4rem;
+  padding: 1rem;
+  background: var(--accent);
+  color: var(--text-color-dark);
+  border-radius: 0.75rem;
+  border: 1px solid transparent;
+  transition: all 0.2s ease-in;
+  cursor: pointer;
+}
+.achievement_text {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.achievement_tab p {
+  font-size: small;
+  line-height: 32px;
+}
+.achievement_tab:hover {
+  scale: 1.04;
+  opacity: 0.9;
+  /* border: 1px solid var(--accent);
+  background-color: var(--primary-color-light);
+  color: var(--text-color-light); */
+}
+
+/*  */
+@media (max-width: 882px) {
+  .achievement_tab p {
+    padding-top: 6px;
+    font-size: 14px;
+    line-height: 18px;
+  }
+}

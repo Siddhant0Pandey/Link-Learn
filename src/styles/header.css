@@ -1,0 +1,100 @@
+@import url("../styles/globals.css");
+
+nav {
+  height: auto;
+  padding: 1rem 0;
+  margin-bottom: 0.8rem;
+  color: var(--text-color-light);
+}
+.header_section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+hr {
+  margin-top: 12px;
+  opacity: 0.6;
+  /* border-top: 1px solid var(--color-extra); */
+}
+.navbar_rightsection {
+  display: flex;
+  justify-items: center;
+  gap: 20px;
+}
+
+.logo_text {
+  color: var(--accent);
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+/* Setting and Note tab */
+
+.settingandnote_tab {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 0.5rem;
+  height: 90%;
+  width: 105px;
+  background-color: var(--color-extra);
+  padding: 0.5rem 1.25rem;
+  border-radius: 1rem;
+}
+
+/* Note section */
+.notebook_tab {
+  display: flex;
+  position: relative;
+  justify-content: center;
+  align-items: start;
+  gap: 1px;
+  cursor: default;
+}
+.note_icon {
+  padding-top: 3px;
+  position: relative;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+/* .notetab_icons {
+  display: none;
+} */
+
+.default-icon {
+  display: block;
+}
+.openNote_style {
+  color: var(--accent);
+}
+/* .notebook_tab:hover .default-icon {
+  display: none;
+} */
+.notebook_tab:hover .note_text {
+  opacity: 0.7;
+}
+.notebook_tab:hover {
+  color: var(--accent);
+}
+
+.note_text {
+  font-weight: bold;
+  scale: 0.8;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+/* setting section */
+.setting_icon {
+  cursor: pointer;
+}
+.setting_icon:hover {
+  scale: 1.1;
+  color: var(--accent);
+}
+
+.setting_tab {
+  position: relative;
+}
+.icon_set {
+  padding-top: 4px;
+}
+.icon_set_sharp {
+  padding-top: 4px;
+  color: var(--accent);
+}

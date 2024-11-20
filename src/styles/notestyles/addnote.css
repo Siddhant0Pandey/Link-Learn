@@ -1,0 +1,187 @@
+@import url("../notestyles/notecontainer.css");
+@import url("../globals.css");
+
+/*  */
+
+.addnotebox {
+  position: absolute;
+  /* right: 40%; */
+  width: auto;
+  margin: 0 auto;
+  z-index: 10;
+}
+.noteblurred {
+  filter: blur(2px);
+  z-index: -10;
+}
+/*  */
+
+.addNote_container {
+  border: 2px solid var(--accent);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  /* width: 70vw; */
+  height: 50vh;
+  margin: 1rem auto;
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 0.5rem;
+}
+
+.title_tab {
+  display: flex;
+  gap: 0.7rem;
+  justify-content: space-between;
+  height: 20%;
+}
+
+.title_tab input {
+  flex: 1;
+  border-radius: 0.5rem;
+  border: none;
+  border: 1px solid var(--accent);
+  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.15);
+
+  background-color: transparent;
+  font-weight: bold;
+  padding: 0.5rem;
+}
+
+.title_tab input:focus {
+  outline: none;
+}
+
+.title_tab input::placeholder {
+  text-transform: capitalize;
+  padding: 0.7rem;
+  color: var(--accent);
+}
+
+.tag_label {
+  display: flex;
+  gap: 0.4rem;
+  align-items: flex-start;
+}
+#title_input {
+  border-radius: 0.3rem;
+}
+.tag_label h4 {
+  background-color: var(--accent);
+  border-radius: 0.5rem;
+  padding: 0.2rem 0.4rem 0.6rem 0.4rem;
+  color: var(--text-color-dark);
+  margin: 0;
+  font-size: 0.875rem;
+  /* box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); */
+}
+
+.tag_label select {
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  font-weight: bold;
+  padding: 0.2rem;
+  background-color: transparent;
+  border-radius: 0.25rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.tag_label select:focus {
+  outline: 1px solid var(--accent);
+}
+.tag_label option:focus {
+  background-color: var(--accent);
+}
+
+.note_content_add {
+  margin-top: 0.5rem;
+
+  height: 90%;
+}
+
+.note_content_add textarea {
+  width: 90%;
+  height: 250px;
+  padding: 0.6rem;
+  margin: 0 auto;
+  /* height: 250px; */
+  min-height: 150px;
+  border: 2px solid var(--accent);
+  border: none;
+  border-radius: 0.25rem;
+
+  background-color: transparent;
+  resize: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.note_content_add textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.note_btn {
+  height: 20%;
+}
+.note_content_add textarea::placeholder {
+  text-transform: capitalize;
+}
+
+.btn_cancel,
+.btn_save {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.btn_cancel {
+  border: 1px solid var(--accent);
+  border: none;
+  background-color: transparent;
+  color: var(--accent);
+  margin-right: 0.5rem;
+}
+
+.btn_save {
+  border: none;
+  background-color: var(--accent);
+  color: var(--text-color-dark);
+}
+
+.btn_cancel:hover,
+.btn_save:hover {
+  opacity: 0.8;
+  scale: 0.9;
+}
+option {
+  padding: 1rem;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  border-radius: 0.5rem;
+}
+
+/*  */
+
+@media (max-width: 964px) {
+  .note_content_add textarea {
+    width: 90%;
+    margin: 0 auto;
+    height: 200px;
+  }
+}
+@media (max-width: 528px) {
+  .note_content_add textarea {
+    width: 90%;
+    height: 130px;
+  }
+  .title_tab {
+    display: flex;
+    gap: 0.7rem;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 20%;
+    width: 100%;
+  }
+}
+/*  */
