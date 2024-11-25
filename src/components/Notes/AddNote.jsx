@@ -2,7 +2,7 @@
 import "../../styles/notestyles/addnote.css";
 import { useState } from "react";
 
-export default function AddNote({ saveNote }) {
+export default function AddNote({ saveNote, cancelNote }) {
   const [title, setTitle] = useState("");
   const [tag, setTag] = useState("Personal");
   const [content, setContent] = useState("");
@@ -50,7 +50,7 @@ export default function AddNote({ saveNote }) {
           <button
             type="button"
             className="btn_cancel"
-            onClick={() => saveNote(null)}
+            onClick={() => cancelNote()}
           >
             Cancel
           </button>

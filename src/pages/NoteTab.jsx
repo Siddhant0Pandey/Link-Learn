@@ -30,6 +30,10 @@ function NoteTab() {
     setAddNote(false);
   };
 
+  const cancelNote = () => {
+    setAddNote(false);
+  };
+
   const deleteNote = (index) => {
     setNotes(notes.filter((_, i) => i !== index));
   };
@@ -53,7 +57,7 @@ function NoteTab() {
       {/* Add Note Form */}
       {addNote && (
         <div className="addnotebox">
-          <AddNote saveNote={saveNote} />
+          <AddNote saveNote={saveNote} cancelNote={cancelNote} />
         </div>
       )}
 
