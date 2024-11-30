@@ -105,6 +105,7 @@
 }
 .link_label a {
   color: gray;
+  text-decoration: none;
 }
 .link_label:hover a {
   color: var(--accent);
@@ -168,6 +169,7 @@
 .activity_description {
   display: flex;
   gap: 0.2rem;
+  margin-bottom: 0.2rem;
   /* justify-content: space-between; */
   /* background-color: var(--color-extra); */
   /* padding: 0.5rem; */
@@ -327,9 +329,10 @@
 .shortcut_name {
   font-size: 14px;
   font-weight: 500;
+  width: 40px;
   /* color: var(--pastel-text); */
-  word-wrap: break-word;
-  margin-top: 4px;
+  overflow: hidden;
+  /* word-wrap: break-word; */
 }
 
 /* Delete Icon */

@@ -195,7 +195,7 @@ export default function EducationalActivities() {
           className={`shortcut_grid ${showShortcutForm ? "linksblurred" : ""}`}
         >
           {shortcuts.map((shortcut, index) => (
-            <div key={index} className="shortcut_item">
+            <div key={index} className="shortcut_item" title={shortcut.name}>
               <a href={shortcut.url} target="_blank" rel="noopener noreferrer">
                 <div className="shortcut_icon">
                   {shortcut.icon ? (
