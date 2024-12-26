@@ -19,6 +19,7 @@ hr {
 .navbar_rightsection {
   display: flex;
   justify-items: center;
+  align-items: center;
   gap: 20px;
 }
 
@@ -96,5 +97,22 @@ hr {
 }
 .icon_set_sharp {
   padding-top: 4px;
+  color: var(--accent);
+}
+/*  */
+.profile_box {
+  padding: 0 5px;
+  height: 30px;
+  /* background: #f5f0e5; */
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  gap: 0.8rem;
+  cursor: pointer;
+}
+
+.profile_text {
+  font-style: italic;
+  text-transform: lowercase;
   color: var(--accent);
 }

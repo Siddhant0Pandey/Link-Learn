@@ -11,7 +11,7 @@ function App() {
 
   return (
     <div className={`${theme} ${font} fix_width`}>
-      <div className={`container `}>
+      <div className={`container`}>
         <Header openNote={openNote} setOpenNote={setOpenNote} />
         <Page openNote={openNote} setOpenNote={setOpenNote} />
         <Footer />

@@ -46,7 +46,7 @@ function RegisterForm() {
         setName("");
         setUserName("");
         setPassword("");
-        // navigate("/login");
+        navigate("/login");
       })
       .catch((err) => {
         console.error("Error:", err);

@@ -8,7 +8,7 @@ function Header({ openNote, setOpenNote }) {
   return (
     <>
       <nav>
-        <div className="container header_section">
+        <div className=" header_section">
           <h4 className="logo_text">Link&Learn</h4>
           <div className="navbar_rightsection">
             <div className="settingandnote_tab">

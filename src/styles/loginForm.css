@@ -6,6 +6,8 @@
   --bg-color: #fff;
   --bg-color-alt: #90c2a7;
   --main-color: #353535;
+  --success: "#009973";
+  --error: crimson;
   /* display: flex; */
   /* flex-direction: column; */
   /* align-items: center; */
@@ -197,8 +199,8 @@
 
 .flip-card__btn {
   margin: 20px 0 20px 0;
-  width: 120px;
-  height: 40px;
+  /* width: 120px; */
+  padding: 10px 40px;
   border-radius: 5px;
   border: 2px solid var(--main-color);
   background-color: var(--bg-color);
@@ -206,10 +208,24 @@
   font-size: 17px;
   font-weight: 600;
   color: var(--font-color);
+  text-decoration: none;
   cursor: pointer;
 }
 
 .flip-card__btn:hover {
   box-shadow: 2px 2px var(--main-color);
   transform: translate(2px, 2px);
+}
+
+.error_msg {
+  color: var(--error);
+  font-family: monospace;
+  font-size: large;
+}
+.success_msg {
+  color: var(--success);
+  font-family: monospace;
+  font-size: large;
+  padding: 0.2rem;
+  margin-bottom: 1rem;
 }
