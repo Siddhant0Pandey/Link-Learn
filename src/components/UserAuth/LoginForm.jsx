@@ -25,23 +25,27 @@ function LoginForm() {
       },
       body: JSON.stringify(data),
     })
-      .then((res) => {
+      .then(async (res) => {
         if (!res.ok) {
-          return res.json().then((data) => {
-            throw new Error(
-              data.message || "Failed to login.Please try again!"
-            );
-          });
+          const errorData = await res.json();
+          throw new Error(
+            errorData.message || "Failed to login. Please try again!"
+          );
         }
         return res.json();
       })
       .then((data) => {
-        console.log(data);
         setError("");
+
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("username", data.user.username);
+        localStorage.setItem("name", data.user.name);
+
         setSuccessMessage(
-          data.message || "Login successful!, Please go to Login Page"
+          data.message || "Login successful! Please go to the homepage."
         );
         setLoading(false);
+
         setUserName("");
         setPassword("");
         navigate("/");
