@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types */
-import Profile from "./UserProfile/profile";
 import "../../styles/header.css";
 import SettingTab from "./OptionTab/SettingTab";
 import Note from "../Notes/Note";
+import Profile from "./UserProfile/Profile";
 
 function Header({ openNote, setOpenNote }) {
   return (
