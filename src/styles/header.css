@@ -110,9 +110,40 @@ hr {
   gap: 0.8rem;
   cursor: pointer;
 }
-
+.profile_box:hover .profile_text {
+  text-decoration: underline;
+}
 .profile_text {
   font-style: italic;
-  text-transform: lowercase;
+  text-transform: capitalize;
   color: var(--accent);
+}
+/* logout */
+
+.logout_box {
+  position: absolute;
+  z-index: 10;
+  top: 3.5rem;
+  right: 4rem;
+  padding: 1rem;
+  background-color: var(--color-extra);
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  box-shadow: 2px 2px 10px var(--text-color-light);
+}
+.logout_text {
+  font-weight: bold;
+  scale: 0.8;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  text-decoration: none;
+  color: var(--text-color-light);
+}
+.logout_text:hover {
+  text-decoration: underline;
+}
+.logout_icon {
+  color: var(--text-color-light);
 }
