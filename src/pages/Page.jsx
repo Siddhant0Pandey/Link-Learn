@@ -9,7 +9,9 @@ function Page({ openNote, setOpenNote }) {
       {openNote ? (
         <NoteTab openNote={openNote} setOpenNote={setOpenNote} />
       ) : (
-        <Hero />
+        <>
+          <Hero />
+        </>
       )}
     </div>
   );
