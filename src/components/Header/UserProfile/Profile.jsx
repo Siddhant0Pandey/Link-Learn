@@ -14,9 +14,10 @@ function Profile() {
     }
   }, []);
 
-  function toggleLogout() {
-    console.log("clicked");
+  function toggleLogout(e) {
+    e.preventDefault();
     setLogout(!logout);
+    localStorage.removeItem("token");
   }
 
   return (
