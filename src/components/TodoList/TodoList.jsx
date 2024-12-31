@@ -3,41 +3,146 @@ import "../../styles/todolist.css";
 import { useState, useEffect } from "react";
 import TodolistItems from "./TodolistItems";
 import { MdOutlineLibraryAdd, MdOutlineLibraryAddCheck } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 
 function TodoList() {
-  const [tasks, setTasks] = useState(() => {
-    const savedTasks = localStorage.getItem("todoTasks");
-    return savedTasks ? JSON.parse(savedTasks) : [];
-  });
+  const [tasks, setTasks] = useState([]);
   const [todoinput, setTodoInput] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+
+  const getAuthToken = () => {
+    return localStorage.getItem("token");
+  };
 
   useEffect(() => {
-    localStorage.setItem("todoTasks", JSON.stringify(tasks));
-  }, [tasks]);
+    const fetchTasks = async () => {
+      const token = getAuthToken();
+      if (!token) {
+        alert("You need to log in to view your tasks.");
+        return;
+      }
 
-  function handleTodoInput() {
+      try {
+        const response = await fetch("http://localhost:3000/tasks", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response.json();
+        const mappedTasks = data.tasks.map((task) => ({
+          id: task._id,
+          text: task.title,
+          completed: task.isCompleted,
+        }));
+        setTasks(mappedTasks);
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTasks();
+  }, []);
+
+  const handleTodoInput = () => {
     setTodoInput((prev) => !prev);
-  }
+    navigate("/tasks");
+  };
 
-  function addTask(task) {
-    setTasks((prevTasks) => [...prevTasks, { text: task, completed: false }]);
-    setTodoInput(false);
-  }
+  const addTask = (task) => {
+    const token = getAuthToken();
+    if (!token) {
+      alert("You need to log in to add tasks.");
+      return;
+    }
 
-  function toggleTask(index) {
-    setTasks((prevTasks) =>
-      prevTasks.map((task, i) =>
-        i === index ? { ...task, completed: !task.completed } : task
-      )
-    );
-  }
+    fetch("http://localhost:3000/tasks", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ title: task, isCompleted: false }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.task) {
+          setTasks((prevTasks) => [
+            ...prevTasks,
+            {
+              id: data.task._id,
+              text: data.task.title,
+              completed: data.task.isCompleted,
+            },
+          ]);
+          setTodoInput(false);
+        }
+      })
+      .catch((error) => {
+        console.error("Error adding task:", error);
+      });
+  };
 
-  function deleteTask(index) {
-    setTasks((prevTasks) => prevTasks.filter((_, i) => i !== index));
+  const toggleTask = async (index) => {
+    const token = getAuthToken();
+    if (!token) {
+      alert("You need to log in to update tasks.");
+      return;
+    }
+
+    const taskToToggle = tasks[index];
+    const updatedTask = { ...taskToToggle, completed: !taskToToggle.completed };
+
+    try {
+      await fetch(`http://localhost:3000/tasks/${taskToToggle.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ isCompleted: updatedTask.completed }),
+      });
+
+      setTasks((prevTasks) =>
+        prevTasks.map((task, i) => (i === index ? updatedTask : task))
+      );
+    } catch (error) {
+      console.error("Error updating task:", error);
+    }
+  };
+
+  const deleteTask = (index) => {
+    const token = getAuthToken();
+    if (!token) {
+      alert("You need to log in to delete tasks.");
+      return;
+    }
+
+    const taskToDelete = tasks[index];
+    fetch(`http://localhost:3000/tasks/${taskToDelete.id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          setTasks((prevTasks) => prevTasks.filter((_, i) => i !== index));
+        }
+      })
+      .catch((error) => {
+        console.error("Error deleting task:", error);
+      });
+  };
+
+  if (isLoading) {
+    return <div className="loading">Loading tasks...</div>;
   }
 
   return (
-    <div className={`todolist_container`}>
+    <div className="todolist_container">
       <div className="todolist_label">
         <h3>To-Do List</h3>
         <div>
@@ -61,7 +166,7 @@ function TodoList() {
         <ul className={`task_list ${todoinput ? "blurred" : ""}`}>
           {tasks.map((task, index) => (
             <li
-              key={index}
+              key={task.id}
               className={`task_item ${task.completed ? "completed" : ""}`}
             >
               <input
