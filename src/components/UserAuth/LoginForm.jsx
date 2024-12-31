@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useNavigate } from "react-router-dom";
 import "../../styles/loginForm.css";
 import { useState } from "react";
@@ -80,7 +81,7 @@ function LoginForm() {
           onChange={(e) => setPassword(e.target.value)}
         />
         <button type="submit" className="flip-card__btn">
-          {loading ? "Login.." : "Let`s go!"}
+          {loading ? "Login..." : "Let`s go!"}
         </button>
       </form>
     </div>
