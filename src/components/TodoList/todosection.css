@@ -1,0 +1,25 @@
+@import url("../../styles/globals.css");
+
+.todolist_container {
+  padding: 0 1rem;
+}
+.goback_btn {
+  margin: 1rem 0;
+  flex: 1;
+  padding: 12px;
+  background: transparent;
+  font-weight: bold;
+  color: var(--accent);
+  cursor: pointer;
+  border-radius: 0.75rem;
+  border: 1px solid var(--accent);
+  transition: scale 0.2s ease-in-out;
+  text-decoration: none;
+}
+.goback_btn:hover {
+  background-color: var(--accent);
+  color: white;
+}
+.todolist_section {
+  margin: 2rem 0;
+}
