@@ -9,12 +9,13 @@ function TodoSection() {
   return (
     <div className="todolist_container">
       <Header />
-      <Link to="/" className="goback_btn">
-        Go to home page
-      </Link>
+
       <div className="todolist_section">
         <TodoList />
       </div>
+      <Link to="/" className="goback_btn">
+        Go to home page
+      </Link>
       {/* <Footer /> */}
     </div>
   );
