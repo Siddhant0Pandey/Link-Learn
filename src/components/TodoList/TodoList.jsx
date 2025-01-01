@@ -3,13 +3,13 @@ import "../../styles/todolist.css";
 import { useState, useEffect } from "react";
 import TodolistItems from "./TodolistItems";
 import { MdOutlineLibraryAdd, MdOutlineLibraryAddCheck } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 
 function TodoList() {
   const [tasks, setTasks] = useState([]);
   const [todoinput, setTodoInput] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const getAuthToken = () => {
     return localStorage.getItem("token");
@@ -48,7 +48,7 @@ function TodoList() {
 
   const handleTodoInput = () => {
     setTodoInput((prev) => !prev);
-    navigate("/tasks");
+    // navigate("/todo");
   };
 
   const addTask = (task) => {
