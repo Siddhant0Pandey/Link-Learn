@@ -17,9 +17,11 @@ function Profile() {
   function toggleLogout(e) {
     e.preventDefault();
     setLogout(!logout);
-    localStorage.removeItem("token");
   }
 
+  function handleLogout() {
+    localStorage.removeItem("token");
+  }
   return (
     <>
       <div className="profile_box" onClick={toggleLogout}>
@@ -44,7 +46,7 @@ function Profile() {
               className="logout_icon"
             />
           </span>
-          <Link to="/login" className="logout_text">
+          <Link to="/login" className="logout_text" onClick={handleLogout}>
             LogOut
           </Link>
         </div>
