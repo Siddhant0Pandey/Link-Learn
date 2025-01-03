@@ -5,59 +5,206 @@ import {
   IoTrashBinOutline,
 } from "react-icons/io5";
 import { PiVideoLight } from "react-icons/pi";
-import imageCompression from "browser-image-compression";
+// import imageCompression from "browser-image-compression";
+import { useNavigate } from "react-router-dom";
 
 export default function EntertainmentActivities() {
-  const [links, setLinks] = useState(() => {
-    const savedLinks = localStorage.getItem("entertainmentLinks");
-    return savedLinks ? JSON.parse(savedLinks) : [];
-  });
+  const [links, setLinks] = useState([]);
   const [newLink, setNewLink] = useState("");
-  const [showInput, setShowInput] = useState(false);
   const [newLinkName, setNewLinkName] = useState("");
-  const [shortcuts, setShortcuts] = useState(() => {
-    const savedShortcuts = localStorage.getItem("entertainmentShortcuts");
-    return savedShortcuts ? JSON.parse(savedShortcuts) : [];
-  });
+
+  const [showInput, setShowInput] = useState(false);
+  const [shortcuts, setShortcuts] = useState([]);
 
   const [showShortcutForm, setShowShortcutForm] = useState(false);
   const [newShortcutName, setNewShortcutName] = useState("");
   const [newShortcutURL, setNewShortcutURL] = useState("");
-  const [newShortcutIcon, setNewShortcutIcon] = useState("");
+  // const [newShortcutIcon, setNewShortcutIcon] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  const navigate = useNavigate();
+
+  // fetching the list of links
+
+  const getAuthToken = () => {
+    return localStorage.getItem("token");
+  };
 
   useEffect(() => {
-    localStorage.setItem("entertainmentShortcuts", JSON.stringify(shortcuts));
-  }, [shortcuts]);
+    const fetchEntLinks = async () => {
+      const token = getAuthToken();
+      if (!token) {
+        const valOk = confirm("You need to log in to view your links");
+        if (valOk) {
+          navigate("/login");
+        }
+        return;
+      }
+      try {
+        const response = await fetch("http://localhost:3000/entactivity", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-  const handleAddShortcut = (e) => {
+        const data = await response.json();
+        console.log("API Response:", data);
+
+        if (data && data.entLink && Array.isArray(data.entLink)) {
+          const mappedEntLinks = data.entLink.map((link) => ({
+            id: link._id,
+            title: link.title,
+            url: link.url,
+          }));
+          setLinks(mappedEntLinks);
+        } else {
+          console.error("entLink is not an array or undefined:", data);
+          setLinks([]);
+        }
+
+        if (
+          data &&
+          data.entShortcutLink &&
+          Array.isArray(data.entShortcutLink)
+        ) {
+          const mappedShortEntLinks = data.entShortcutLink.map((link) => ({
+            id: link._id,
+            title: link.title,
+            url: link.url,
+          }));
+          setShortcuts(mappedShortEntLinks);
+        } else {
+          console.error("entShortcutLink is not an array or undefined:", data);
+          setShortcuts([]);
+        }
+      } catch (err) {
+        console.error("Error fetching educational links:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchEntLinks();
+  }, []);
+
+  const handleAddShortcut = async (e) => {
     e.preventDefault();
-    if (newShortcutName.trim() && newShortcutURL.trim()) {
-      setShortcuts([
-        ...shortcuts,
-        { name: newShortcutName, url: newShortcutURL, icon: newShortcutIcon },
-      ]);
-      setNewShortcutName("");
-      setNewShortcutURL("");
-      setShowShortcutForm(false);
+
+    const token = getAuthToken();
+    if (!token) {
+      const valOk = confirm("You need to log in to view your links");
+      if (valOk === true) {
+        navigate("/login");
+      }
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:3000/entactivity", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ title: newShortcutName, url: newShortcutURL }),
+      });
+
+      const data = await response.json();
+      console.log(data);
+
+      if (response.ok && newShortcutURL.trim() && newShortcutName.trim()) {
+        setShortcuts((prevShortcuts) => [
+          ...prevShortcuts,
+          {
+            id: data.entShortcutLink._id,
+            title: data.entShortcutLink.title,
+            url: data.entShortcutLink.url,
+          },
+        ]);
+        setNewShortcutName("");
+        setNewShortcutURL("");
+        setShowShortcutForm(false);
+      } else {
+        console.error(
+          "Failed to add shortcut:",
+          data.message || "entShortcutLink is missing"
+        );
+        alert(
+          data.message || "Unexpected error occurred while adding the shortcut."
+        );
+      }
+    } catch (err) {
+      console.error("Error adding link:", err);
     }
   };
 
-  const handleDeleteShortcut = (index) => {
-    setShortcuts(shortcuts.filter((_, i) => i !== index));
+  const handleDeleteShortcut = async (index) => {
+    const token = getAuthToken();
+    if (!token) {
+      alert("You need to log in to delete tasks.");
+      return;
+    }
+
+    const linkToDelete = shortcuts[index];
+    try {
+      const response = await fetch(
+        `http://localhost:3000/entactivity/${linkToDelete.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.ok) {
+        setShortcuts(shortcuts.filter((_, i) => i !== index));
+      }
+    } catch (err) {
+      console.log("Error deleting the task", err);
+    }
   };
 
-  useEffect(() => {
-    localStorage.setItem("entertainmentLinks", JSON.stringify(links));
-  }, [links]);
-
-  const handleAddLink = (e) => {
+  const handleAddLink = async (e) => {
     e.preventDefault();
+    const token = getAuthToken();
+    if (!token) {
+      const valOk = confirm("You need to log in to view your links");
+      if (valOk === true) {
+        navigate("/login");
+      }
+      return;
+    }
 
-    if (newLink.trim() && newLinkName.trim()) {
-      setLinks([...links, { name: newLinkName, url: newLink }]);
-      setNewLink("");
-      setNewLinkName("");
-      setShowInput(false);
+    try {
+      const response = await fetch("http://localhost:3000/entactivity", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ title: newLinkName, url: newLink }),
+      });
+
+      const data = await response.json();
+      console.log(data);
+
+      if (response.ok && newLink.trim() && newLinkName.trim()) {
+        setLinks([
+          ...links,
+          {
+            id: data.entLink._id,
+            title: data.entLink.title,
+            url: data.entLink.url,
+          },
+        ]);
+
+        setNewLink("");
+        setNewLinkName("");
+        setShowInput(false);
+      } else {
+        console.error("Failed to add link:", data.message || "Unknown error");
+      }
+    } catch (err) {
+      console.error("Error adding link:", err);
     }
   };
 
@@ -74,35 +221,59 @@ export default function EntertainmentActivities() {
     setShowInput(false);
   };
 
-  const handleDeleteLink = (index) => {
-    setLinks(links.filter((_, i) => i !== index));
-  };
-
-  const handleIconUpload = async (e) => {
-    const file = e.target.files[0];
-    const validTypes = ["image/png", "image/jpeg"];
-    if (!validTypes.includes(file.type)) {
-      alert("Only PNG and JPEG files are allowed!");
+  const handleDeleteLink = async (index) => {
+    const token = getAuthToken();
+    if (!token) {
+      alert("You need to log in to delete tasks.");
       return;
     }
-    if (file) {
-      try {
-        const compressedFile = await imageCompression(file, {
-          maxSizeMB: 0.1, // Maximum size in MB (adjust as needed)
-          maxWidthOrHeight: 100, // Resize dimensions
-          useWebWorker: true,
-        });
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          setNewShortcutIcon(event.target.result); // Store Base64 encoded compressed image
-        };
-        reader.readAsDataURL(compressedFile);
-      } catch (error) {
-        console.error("Error compressing the image:", error);
+
+    const linkToDelete = links[index];
+    try {
+      const response = await fetch(
+        `http://localhost:3000/entactivity/${linkToDelete.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.ok) {
+        setLinks(links.filter((_, i) => i !== index));
       }
+    } catch (err) {
+      console.log("Error deleting the task", err);
     }
   };
 
+  // const handleIconUpload = async (e) => {
+  //   const file = e.target.files[0];
+  //   const validTypes = ["image/png", "image/jpeg"];
+  //   if (!validTypes.includes(file.type)) {
+  //     alert("Only PNG and JPEG files are allowed!");
+  //     return;
+  //   }
+  //   if (file) {
+  //     try {
+  //       const compressedFile = await imageCompression(file, {
+  //         maxSizeMB: 0.1, // Maximum size in MB (adjust as needed)
+  //         maxWidthOrHeight: 100, // Resize dimensions
+  //         useWebWorker: true,
+  //       });
+  //       const reader = new FileReader();
+  //       reader.onload = (event) => {
+  //         setNewShortcutIcon(event.target.result); // Store Base64 encoded compressed image
+  //       };
+  //       reader.readAsDataURL(compressedFile);
+  //     } catch (error) {
+  //       console.error("Error compressing the image:", error);
+  //     }
+  //   }
+  // };
+  if (isLoading) {
+    return <div className="loading">Loading tasks...</div>;
+  }
   return (
     <div className="entertainment_container">
       <div className="entertainment_label">
@@ -162,7 +333,7 @@ export default function EntertainmentActivities() {
                   <PiVideoLight className="link_type_icon" />
                 </span>
                 <a href={link.url} target="_blank" rel="noopener noreferrer">
-                  {link.name}
+                  {link.title}
                 </a>
               </div>
               <IoTrashBinOutline
@@ -196,16 +367,16 @@ export default function EntertainmentActivities() {
           className={`shortcut_grid ${showShortcutForm ? "linksblurred" : ""}`}
         >
           {shortcuts.map((shortcut, index) => (
-            <div key={index} className="shortcut_item" title={shortcut.name}>
+            <div key={index} className="shortcut_item" title={shortcut.title}>
               <a href={shortcut.url} target="_blank" rel="noopener noreferrer">
                 <div className="shortcut_icon">
                   {shortcut.icon ? (
-                    <img src={shortcut.icon} alt={shortcut.name} />
+                    <img src={shortcut.icon} alt={shortcut.title} />
                   ) : (
-                    shortcut.name[0]
+                    shortcut.title[0]
                   )}
                 </div>
-                <div className="shortcut_name">{shortcut.name}</div>
+                <div className="shortcut_name">{shortcut.title}</div>
               </a>
               <IoTrashBinOutline
                 className="shortcuts_delete_icon"
@@ -247,7 +418,7 @@ export default function EntertainmentActivities() {
                   className="link_url"
                   required
                 />
-                <label htmlFor="iconUpload" className="file_input_label">
+                {/*    <label htmlFor="iconUpload" className="file_input_label">
                   Choose Icon
                 </label>
                 <p>(Optional)</p>
@@ -255,9 +426,9 @@ export default function EntertainmentActivities() {
                   type="file"
                   id="iconUpload"
                   accept="image/png, image/jpeg"
-                  onChange={(e) => handleIconUpload(e)}
+                  // onChange={(e) => handleIconUpload(e)}
                   className="file_input"
-                />
+                />*/}
               </div>
               <div className="shortcut_form_btns">
                 <button type="submit" className="submit">
