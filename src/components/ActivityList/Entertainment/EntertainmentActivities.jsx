@@ -143,8 +143,8 @@ export default function EntertainmentActivities() {
       alert("You need to log in to delete tasks.");
       return;
     }
-
     const linkToDelete = shortcuts[index];
+    console.log(linkToDelete);
     try {
       const response = await fetch(
         `http://localhost:3000/entactivity/${linkToDelete.id}`,
@@ -155,6 +155,7 @@ export default function EntertainmentActivities() {
           },
         }
       );
+      console.log(response);
       if (response.ok) {
         setShortcuts(shortcuts.filter((_, i) => i !== index));
       }
