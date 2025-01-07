@@ -3,13 +3,24 @@ import "../../styles/todolist.css";
 import { useState, useEffect } from "react";
 import TodolistItems from "./TodolistItems";
 import { MdOutlineLibraryAdd, MdOutlineLibraryAddCheck } from "react-icons/md";
+import { FaRegEdit } from "react-icons/fa";
+
 // import { useNavigate } from "react-router-dom";
 
 function TodoList() {
   const [tasks, setTasks] = useState([]);
   const [todoinput, setTodoInput] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [toggleUpdate, setToggleUpdate] = useState(false);
+  const [updatedTask, setUpdatedTask] = useState("");
+  const [editingTaskIndex, setEditingTaskIndex] = useState(null);
+
   // const navigate = useNavigate();
+
+  const handleCancelLinkForm = () => {
+    setUpdatedTask("");
+    setToggleUpdate(false);
+  };
 
   const getAuthToken = () => {
     return localStorage.getItem("token");
@@ -45,6 +56,10 @@ function TodoList() {
 
     fetchTasks();
   }, []);
+
+  // const handleToggleUpdate = () => {
+  //   setToggleUpdate(!toggleUpdate);
+  // };
 
   const handleTodoInput = () => {
     setTodoInput((prev) => !prev);
@@ -137,6 +152,61 @@ function TodoList() {
       });
   };
 
+  const updateTask = async () => {
+    const token = getAuthToken();
+    if (!token) {
+      alert("You need to log in to update tasks.");
+      return;
+    }
+
+    if (editingTaskIndex === null) {
+      alert("No task is selected for update.");
+      return;
+    }
+
+    const taskToUpdate = tasks[editingTaskIndex];
+
+    if (!updatedTask.trim()) {
+      alert("Please provide a new title for the task.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:3000/tasks/${taskToUpdate.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ title: updatedTask }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update task.");
+      }
+
+      const data = await response.json();
+
+      // Update the task in the state
+      setTasks((prevTasks) =>
+        prevTasks.map((task, index) =>
+          index === editingTaskIndex ? { ...task, text: data.task.title } : task
+        )
+      );
+
+      // Reset states
+      setUpdatedTask("");
+      setEditingTaskIndex(null);
+      setToggleUpdate(false);
+    } catch (error) {
+      console.error("Error updating task:", error);
+      alert("Failed to update task. Please try again.");
+    }
+  };
+
   if (isLoading) {
     return <div className="loading">Loading tasks...</div>;
   }
@@ -165,21 +235,57 @@ function TodoList() {
       ) : (
         <ul className={`task_list ${todoinput ? "blurred" : ""}`}>
           {tasks.map((task, index) => (
-            <li
-              key={task.id}
-              className={`task_item ${task.completed ? "completed" : ""}`}
-            >
-              <input
-                type="checkbox"
-                checked={task.completed}
-                onChange={() => toggleTask(index)}
-                className="list_checkbox"
-              />
-              <span className="list_text">{task.text}</span>
-              <span onClick={() => deleteTask(index)}>
-                <IoTrashBinOutline className="bin" />
-              </span>
-            </li>
+            <>
+              <li
+                key={task.id}
+                className={`task_item ${task.completed ? "completed" : ""}`}
+              >
+                <input
+                  type="checkbox"
+                  checked={task.completed}
+                  onChange={() => toggleTask(index)}
+                  className="list_checkbox"
+                />
+                <span className="list_text">{task.text}</span>
+                <div className="todo_icon_box">
+                  <span
+                    onClick={() => {
+                      setEditingTaskIndex(index);
+                      setUpdatedTask(task.text);
+                      setToggleUpdate(true);
+                    }}
+                  >
+                    <FaRegEdit className="edit_icon" />
+                  </span>
+                  <span onClick={() => deleteTask(index)}>
+                    <IoTrashBinOutline className="bin" />
+                  </span>
+                </div>
+              </li>
+              {/* update component */}
+              {toggleUpdate && (
+                <div className="todoInput">
+                  <input
+                    type="text"
+                    placeholder="Enter the updated task"
+                    className="textinput"
+                    value={updatedTask}
+                    onChange={(e) => setUpdatedTask(e.target.value)}
+                    autoFocus
+                  />
+                  <button onClick={() => updateTask(index)} className="submit">
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    className="cancel_button"
+                    onClick={() => handleCancelLinkForm()}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </>
           ))}
         </ul>
       )}
