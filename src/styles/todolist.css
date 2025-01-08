@@ -119,6 +119,18 @@ input[type="checkbox"] {
   accent-color: var(--accent);
 }
 
+.todo_icon_box {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  color: var(--accent);
+  cursor: pointer;
+}
+.edit_icon:hover {
+  scale: 1.1;
+  opacity: 0.4;
+}
+
 /*  */
 
 @media (max-width: 728px) {
