@@ -172,6 +172,13 @@ function TodoList() {
     }
 
     try {
+      const updatedTaskData = {
+        title: updatedTask,
+        isCompleted: taskToUpdate.completed,
+      };
+
+      console.log("Updating task with ID:", taskToUpdate.id);
+
       const response = await fetch(
         `http://localhost:3000/tasks/${taskToUpdate.id}`,
         {
@@ -180,30 +187,31 @@ function TodoList() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ title: updatedTask }),
+          body: JSON.stringify(updatedTaskData),
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to update task.");
+      if (response.ok) {
+        const updatedResponse = await response.json();
+
+        console.log("Updated task:", updatedResponse.task);
+
+        console.log("Before update:", tasks);
+        setTasks((prevTasks) =>
+          prevTasks.map((task) =>
+            task.id === updatedResponse.task._id ? updatedResponse.task : task
+          )
+        );
+        console.log("After update:", tasks);
+
+        setToggleUpdate(false);
+        setUpdatedTask("");
+      } else {
+        console.error("Failed to update task");
+        alert("Failed to update task. Please try again.");
       }
-
-      const data = await response.json();
-
-      // Update the task in the state
-      setTasks((prevTasks) =>
-        prevTasks.map((task, index) =>
-          index === editingTaskIndex ? { ...task, text: data.task.title } : task
-        )
-      );
-
-      // Reset states
-      setUpdatedTask("");
-      setEditingTaskIndex(null);
-      setToggleUpdate(false);
-    } catch (error) {
-      console.error("Error updating task:", error);
-      alert("Failed to update task. Please try again.");
+    } catch (err) {
+      console.error("Error updating task:", err);
     }
   };
 
@@ -230,10 +238,35 @@ function TodoList() {
           <TodolistItems addTask={addTask} />
         </div>
       )}
+      {toggleUpdate && (
+        <div className={`todoInput`}>
+          <input
+            type="text"
+            placeholder="Enter the updated task"
+            className="textinput"
+            value={updatedTask}
+            onChange={(e) => setUpdatedTask(e.target.value)}
+            autoFocus
+          />
+          <button onClick={() => updateTask()} className="submit">
+            Save
+          </button>
+          <button
+            type="button"
+            className="cancel_button"
+            onClick={() => handleCancelLinkForm()}
+          >
+            Cancel
+          </button>
+        </div>
+      )}
       {tasks.length === 0 ? (
         <div className="empty_message">No tasks here, please add one!</div>
       ) : (
-        <ul className={`task_list ${todoinput ? "blurred" : ""}`}>
+        <ul
+          className={`task_list ${todoinput || toggleUpdate ? "blurred" : ""}`}
+          key={tasks}
+        >
           {tasks.map((task, index) => (
             <>
               <li
@@ -263,28 +296,6 @@ function TodoList() {
                 </div>
               </li>
               {/* update component */}
-              {toggleUpdate && (
-                <div className="todoInput">
-                  <input
-                    type="text"
-                    placeholder="Enter the updated task"
-                    className="textinput"
-                    value={updatedTask}
-                    onChange={(e) => setUpdatedTask(e.target.value)}
-                    autoFocus
-                  />
-                  <button onClick={() => updateTask(index)} className="submit">
-                    Save
-                  </button>
-                  <button
-                    type="button"
-                    className="cancel_button"
-                    onClick={() => handleCancelLinkForm()}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              )}
             </>
           ))}
         </ul>
