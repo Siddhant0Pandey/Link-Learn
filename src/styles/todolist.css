@@ -11,9 +11,11 @@
 
 .blurred {
   filter: blur(3px);
-  z-index: -99;
+  /* z-index: -99; */
 }
-
+.unblurred {
+  filter: none;
+}
 .todolist_label {
   display: flex;
   justify-content: space-between;

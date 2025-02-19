@@ -42,44 +42,51 @@ export default function EducationalActivities() {
         return;
       }
       try {
-        const response = await fetch("http://localhost:3000/eduactivity", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        // Fetch educational links
+        const linksResponse = await fetch(
+          "http://localhost:3000/eduactivity/link",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const linksData = await linksResponse.json();
 
-        const data = await response.json();
-        console.log("API Response:", data);
-
-        if (data && data.eduLink && Array.isArray(data.eduLink)) {
-          const mappedEduLinks = data.eduLink.map((link) => ({
+        if (Array.isArray(linksData)) {
+          const mappedEduLinks = linksData.map((link) => ({
             id: link._id,
             title: link.title,
             url: link.url,
           }));
           setLinks(mappedEduLinks);
         } else {
-          console.error("eduLink is not an array or undefined:", data);
+          console.error("eduLink is not an array or undefined:", linksData);
           setLinks([]);
         }
 
+        // Fetch educational shortcuts
+        const shortcutsResponse = await fetch(
+          "http://localhost:3000/eduactivity/shortcut",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const shortcutsData = await shortcutsResponse.json();
+
         if (
-          data &&
-          data.eduShortcutLink &&
-          Array.isArray(data.eduShortcutLink)
+          shortcutsData.eduShortcutLink &&
+          Array.isArray(shortcutsData.eduShortcutLink)
         ) {
-          const mappedShortEduLinks = data.eduShortcutLink.map((link) => ({
-            id: link._id,
-            title: link.title,
-            url: link.url,
-          }));
-          setShortcuts(mappedShortEduLinks);
+          setShortcuts(shortcutsData.eduShortcutLink);
         } else {
-          console.error("eduShortcutLink is not an array or undefined:", data);
+          console.error("Unexpected shortcuts response format:", shortcutsData);
           setShortcuts([]);
         }
       } catch (err) {
-        console.error("Error fetching educational links:", err);
+        console.error("Error fetching educational links and shortcuts:", err);
       } finally {
         setIsLoading(false);
       }
@@ -100,14 +107,17 @@ export default function EducationalActivities() {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/eduactivity", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ title: newShortcutName, url: newShortcutURL }),
-      });
+      const response = await fetch(
+        "http://localhost:3000/eduactivity/shortcut",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ title: newShortcutName, url: newShortcutURL }),
+        }
+      );
 
       const data = await response.json();
       console.log(data);
@@ -146,9 +156,14 @@ export default function EducationalActivities() {
     }
 
     const linkToDelete = shortcuts[index];
+    if (!linkToDelete || !linkToDelete._id) {
+      console.error("Shortcut ID is undefined:", linkToDelete);
+      return;
+    }
+
     try {
       const response = await fetch(
-        `http://localhost:3000/eduactivity/${linkToDelete.id}`,
+        `http://localhost:3000/eduactivity/shortcut/${linkToDelete._id}`,
         {
           method: "DELETE",
           headers: {
@@ -160,23 +175,22 @@ export default function EducationalActivities() {
         setShortcuts(shortcuts.filter((_, i) => i !== index));
       }
     } catch (err) {
-      console.log("Error deleting the task", err);
+      console.error("Error deleting the shortcut", err);
     }
   };
-
   const handleAddLink = async (e) => {
     e.preventDefault();
     const token = getAuthToken();
     if (!token) {
       const valOk = confirm("You need to log in to view your links");
-      if (valOk === true) {
+      if (valOk) {
         navigate("/login");
       }
       return;
     }
 
     try {
-      const response = await fetch("http://localhost:3000/eduactivity", {
+      const response = await fetch("http://localhost:3000/eduactivity/link", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -186,18 +200,17 @@ export default function EducationalActivities() {
       });
 
       const data = await response.json();
-      console.log(data);
 
-      if (response.ok && newLink.trim() && newLinkName.trim()) {
-        setLinks([
-          ...links,
+      if (response.ok) {
+        // Update state to reflect the new link
+        setLinks((prevLinks) => [
+          ...prevLinks,
           {
-            id: data.eduLink._id,
-            title: data.eduLink.title,
-            url: data.eduLink.url,
+            id: data._id,
+            title: data.title,
+            url: data.url,
           },
         ]);
-
         setNewLink("");
         setNewLinkName("");
         setShowInput(false);
@@ -232,7 +245,7 @@ export default function EducationalActivities() {
     const linkToDelete = links[index];
     try {
       const response = await fetch(
-        `http://localhost:3000/eduactivity/${linkToDelete.id}`,
+        `http://localhost:3000/eduactivity/link/${linkToDelete.id}`,
         {
           method: "DELETE",
           headers: {
