@@ -31,7 +31,7 @@ export default function EntertainmentActivities() {
   };
 
   useEffect(() => {
-    const fetchEntLinks = async () => {
+    const fetchEntLinksAndShortcuts = async () => {
       const token = getAuthToken();
       if (!token) {
         const valOk = confirm("You need to log in to view your links");
@@ -41,49 +41,71 @@ export default function EntertainmentActivities() {
         return;
       }
       try {
-        const response = await fetch("http://localhost:3000/entactivity", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        // Fetch Entertainment Links
+        const linksResponse = await fetch(
+          "http://localhost:3000/entactivity/link",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-        const data = await response.json();
-        console.log("API Response:", data);
+        const linksData = await linksResponse.json();
+        console.log("Entertainment Links API Response:", linksData);
 
-        if (data && data.entLink && Array.isArray(data.entLink)) {
-          const mappedEntLinks = data.entLink.map((link) => ({
-            id: link._id,
-            title: link.title,
-            url: link.url,
-          }));
-          setLinks(mappedEntLinks);
+        if (Array.isArray(linksData)) {
+          setLinks(
+            linksData.map((link) => ({
+              id: link._id,
+              title: link.title,
+              url: link.url,
+            }))
+          );
         } else {
-          console.error("entLink is not an array or undefined:", data);
+          console.error(
+            "Unexpected response for entertainment links:",
+            linksData
+          );
           setLinks([]);
         }
 
-        if (
-          data &&
-          data.entShortcutLink &&
-          Array.isArray(data.entShortcutLink)
-        ) {
-          const mappedShortEntLinks = data.entShortcutLink.map((link) => ({
-            id: link._id,
-            title: link.title,
-            url: link.url,
-          }));
-          setShortcuts(mappedShortEntLinks);
+        // Fetch Entertainment Shortcuts
+        const shortcutsResponse = await fetch(
+          "http://localhost:3000/entactivity/shortcut",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const shortcutsData = await shortcutsResponse.json();
+        console.log("Entertainment Shortcuts API Response:", shortcutsData);
+
+        if (Array.isArray(shortcutsData)) {
+          setShortcuts(
+            shortcutsData.map((shortcut) => ({
+              id: shortcut._id,
+              title: shortcut.title,
+              url: shortcut.url,
+            }))
+          );
         } else {
-          console.error("entShortcutLink is not an array or undefined:", data);
+          console.error(
+            "Unexpected response for entertainment shortcuts:",
+            shortcutsData
+          );
           setShortcuts([]);
         }
       } catch (err) {
-        console.error("Error fetching educational links:", err);
+        console.error("Error fetching entertainment links and shortcuts:", err);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchEntLinks();
+
+    fetchEntLinksAndShortcuts();
   }, []);
 
   const handleAddShortcut = async (e) => {
@@ -99,14 +121,17 @@ export default function EntertainmentActivities() {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/entactivity", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ title: newShortcutName, url: newShortcutURL }),
-      });
+      const response = await fetch(
+        "http://localhost:3000/entactivity/shortcut",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ title: newShortcutName, url: newShortcutURL }),
+        }
+      );
 
       const data = await response.json();
       console.log(data);
@@ -115,7 +140,7 @@ export default function EntertainmentActivities() {
         setShortcuts((prevShortcuts) => [
           ...prevShortcuts,
           {
-            id: data.entShortcutLink._id,
+            id: data.entShortcutLink.id,
             title: data.entShortcutLink.title,
             url: data.entShortcutLink.url,
           },
@@ -147,7 +172,7 @@ export default function EntertainmentActivities() {
     console.log(linkToDelete);
     try {
       const response = await fetch(
-        `http://localhost:3000/entactivity/${linkToDelete.id}`,
+        `http://localhost:3000/entactivity/shortcut/${linkToDelete.id}`,
         {
           method: "DELETE",
           headers: {
@@ -176,7 +201,7 @@ export default function EntertainmentActivities() {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/entactivity", {
+      const response = await fetch("http://localhost:3000/entactivity/link", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -189,10 +214,10 @@ export default function EntertainmentActivities() {
       console.log(data);
 
       if (response.ok && newLink.trim() && newLinkName.trim()) {
-        setLinks([
-          ...links,
+        setLinks((prevLinks) => [
+          ...prevLinks,
           {
-            id: data.entLink._id,
+            id: data.entLink.id,
             title: data.entLink.title,
             url: data.entLink.url,
           },
@@ -232,7 +257,7 @@ export default function EntertainmentActivities() {
     const linkToDelete = links[index];
     try {
       const response = await fetch(
-        `http://localhost:3000/entactivity/${linkToDelete.id}`,
+        `http://localhost:3000/entactivity/link/${linkToDelete.id}`,
         {
           method: "DELETE",
           headers: {
