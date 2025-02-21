@@ -5,6 +5,15 @@
   position: relative;
   /* padding: 1rem; */
 }
+.link_feat_icons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.8rem;
+}
+.edit_icon {
+  color: var(--accent);
+}
 .linksblurred {
   position: relative;
   filter: blur(2px);
