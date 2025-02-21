@@ -192,6 +192,25 @@ function TodoList() {
       );
 
       if (response.ok) {
+        try {
+          const response = await fetch("http://localhost:3000/tasks", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const data = await response.json();
+          const mappedTasks = data.tasks.map((task) => ({
+            id: task._id,
+            text: task.title,
+            completed: task.isCompleted,
+          }));
+          setTasks(mappedTasks);
+        } catch (error) {
+          console.error("Error fetching tasks:", error);
+        } finally {
+          setIsLoading(false);
+        }
+
         const updatedResponse = await response.json();
 
         console.log("Updated task:", updatedResponse.task);
