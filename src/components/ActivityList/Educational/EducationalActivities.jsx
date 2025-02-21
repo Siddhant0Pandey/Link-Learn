@@ -8,6 +8,7 @@ import {
 import { BiBookAlt } from "react-icons/bi";
 // import imageCompression from "browser-image-compression";
 import { useNavigate } from "react-router-dom";
+import { FaRegEdit } from "react-icons/fa";
 
 export default function EducationalActivities() {
   const [links, setLinks] = useState([]);
@@ -24,6 +25,12 @@ export default function EducationalActivities() {
   const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate();
+
+  //update the links
+  const [updatedLink, setUpdatedLink] = useState("");
+  const [updatedTitle, setUpdatedTitle] = useState("");
+
+  const [toggleUpdate, setToggleUpdate] = useState(false);
 
   // fetching the list of links
 
@@ -181,6 +188,7 @@ export default function EducationalActivities() {
   const handleAddLink = async (e) => {
     e.preventDefault();
     const token = getAuthToken();
+
     if (!token) {
       const valOk = confirm("You need to log in to view your links");
       if (valOk) {
@@ -201,16 +209,14 @@ export default function EducationalActivities() {
 
       const data = await response.json();
 
-      if (response.ok) {
-        // Update state to reflect the new link
+      if (response.ok && data) {
+        // Update state with the new link
         setLinks((prevLinks) => [
           ...prevLinks,
-          {
-            id: data._id,
-            title: data.title,
-            url: data.url,
-          },
+          { id: data._id, title: data.title, url: data.url },
         ]);
+
+        // Clear input fields
         setNewLink("");
         setNewLinkName("");
         setShowInput(false);
@@ -219,6 +225,62 @@ export default function EducationalActivities() {
       }
     } catch (err) {
       console.error("Error adding link:", err);
+    }
+  };
+
+  const handleUpdateLink = async (id) => {
+    if (!updatedTitle.trim() || !updatedLink.trim()) {
+      alert("Please enter a valid title and link before saving.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:3000/eduactivity/link/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            title: updatedTitle,
+            url: updatedLink,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update the educational link");
+      }
+
+      const data = await response.json();
+
+      // Ensure the updated object exists in response
+      if (!data.eduLink) {
+        alert("Unexpected response from server.");
+        return;
+      }
+
+      // Map through links and replace the updated one
+      const updatedLinks = links.map((link) =>
+        link.id === id
+          ? {
+              id: data.eduLink._id,
+              title: data.eduLink.title,
+              url: data.eduLink.url,
+            }
+          : link
+      );
+
+      setLinks(updatedLinks);
+      setToggleUpdate(false);
+      setUpdatedTitle("");
+      setUpdatedLink("");
+      alert("Link updated successfully!");
+    } catch (error) {
+      console.error("Error updating link:", error);
+      alert("Failed to update the educational link.");
     }
   };
 
@@ -233,6 +295,7 @@ export default function EducationalActivities() {
   };
   const handleCancelLinkForm = () => {
     setShowInput(false);
+    setToggleUpdate(false);
   };
 
   const handleDeleteLink = async (index) => {
@@ -340,6 +403,38 @@ export default function EducationalActivities() {
               </button>
             </form>
           )}
+
+          {toggleUpdate && (
+            <div className="todoInput">
+              <input
+                type="text"
+                placeholder="Enter the updated title"
+                className="textinput"
+                value={updatedTitle}
+                onChange={(e) => setUpdatedTitle(e.target.value)}
+                autoFocus
+              />
+              <input
+                type="url"
+                placeholder="Enter the updated URL"
+                className="textinput"
+                value={updatedLink}
+                onChange={(e) => setUpdatedLink(e.target.value)}
+              />
+              <button
+                className="submit"
+                onClick={() => handleUpdateLink(toggleUpdate)}
+              >
+                Save
+              </button>
+              <button
+                className="cancel_button"
+                onClick={() => setToggleUpdate(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          )}
         </div>
 
         <ul className={`link_list ${showInput ? "linksblurred" : ""}`}>
@@ -354,10 +449,20 @@ export default function EducationalActivities() {
                     {link.title}
                   </a>
                 </div>
-                <IoTrashBinOutline
-                  className="delete_icon"
-                  onClick={() => handleDeleteLink(index)}
-                />
+                <div className="link_feat_icons">
+                  <FaRegEdit
+                    className="edit_icon"
+                    onClick={() => {
+                      setUpdatedTitle(link.title); // Pre-fill input fields
+                      setUpdatedLink(link.url);
+                      setToggleUpdate(link.id);
+                    }}
+                  />
+                  <IoTrashBinOutline
+                    className="delete_icon"
+                    onClick={() => handleDeleteLink(index)}
+                  />{" "}
+                </div>
               </li>
             ))
           ) : (
