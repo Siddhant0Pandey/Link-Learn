@@ -38,9 +38,13 @@ function LoginForm() {
       .then((data) => {
         setError("");
 
+        // Store login details
         localStorage.setItem("token", data.token);
         localStorage.setItem("username", data.user.username);
         localStorage.setItem("name", data.user.name);
+
+        // ✅ Store the login time
+        localStorage.setItem("loginTime", new Date().getTime());
 
         setSuccessMessage(
           data.message || "Login successful! Please go to the homepage."
@@ -49,6 +53,8 @@ function LoginForm() {
 
         setUserName("");
         setPassword("");
+
+        // Navigate to home
         navigate("/");
       })
       .catch((err) => {
