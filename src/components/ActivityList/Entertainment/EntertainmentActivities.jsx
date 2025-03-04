@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+// import { BiBookAlt } from "react-icons/bi";
+import { FaRegEdit } from "react-icons/fa";
 import {
   IoAddCircle,
   IoAddCircleOutline,
@@ -24,6 +26,62 @@ export default function EntertainmentActivities() {
 
   const navigate = useNavigate();
 
+  //update the links
+  const [updatedLink, setUpdatedLink] = useState("");
+  const [updatedTitle, setUpdatedTitle] = useState("");
+
+  const [toggleUpdate, setToggleUpdate] = useState(false);
+
+  const openWindows = new Map();
+
+  const handleOpenLink = (link) => {
+    const startTime = Date.now();
+    const newTab = window.open(link, "_blank");
+
+    if (!newTab) return;
+
+    console.log("start time: ", startTime);
+
+    openWindows.set(newTab, startTime);
+
+    const checkTabClosed = setInterval(() => {
+      if (newTab.closed) {
+        clearInterval(checkTabClosed);
+        const endTime = Date.now();
+        const timeSpent = Math.floor((endTime - startTime) / 1000);
+
+        console.log("end time", timeSpent);
+        if (timeSpent > 0) {
+          sendTimeToBackend(link, timeSpent);
+        }
+
+        openWindows.delete(newTab);
+      }
+    }, 1000);
+  };
+
+  const sendTimeToBackend = async (link, timeSpent) => {
+    // Removed title since it's not needed
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const response = await fetch("http://localhost:3000/entactivity/link", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ title: link, url: link, timeSpent }), // ✅ Correct mapping
+      });
+
+      const data = await response.json();
+      console.log("Time recorded:", data);
+    } catch (error) {
+      console.error("Error sending time:", error);
+    }
+  };
+
   // fetching the list of links
 
   const getAuthToken = () => {
@@ -31,7 +89,7 @@ export default function EntertainmentActivities() {
   };
 
   useEffect(() => {
-    const fetchEntLinksAndShortcuts = async () => {
+    const fetchEntLinks = async () => {
       const token = getAuthToken();
       if (!token) {
         const valOk = confirm("You need to log in to view your links");
@@ -41,7 +99,7 @@ export default function EntertainmentActivities() {
         return;
       }
       try {
-        // Fetch Entertainment Links
+        // Fetch educational links
         const linksResponse = await fetch(
           "http://localhost:3000/entactivity/link",
           {
@@ -50,27 +108,21 @@ export default function EntertainmentActivities() {
             },
           }
         );
-
         const linksData = await linksResponse.json();
-        console.log("Entertainment Links API Response:", linksData);
 
         if (Array.isArray(linksData)) {
-          setLinks(
-            linksData.map((link) => ({
-              id: link._id,
-              title: link.title,
-              url: link.url,
-            }))
-          );
+          const mappedEduLinks = linksData.map((link) => ({
+            id: link._id,
+            title: link.title,
+            url: link.url,
+          }));
+          setLinks(mappedEduLinks);
         } else {
-          console.error(
-            "Unexpected response for entertainment links:",
-            linksData
-          );
+          console.error("entLink is not an array or undefined:", linksData);
           setLinks([]);
         }
 
-        // Fetch Entertainment Shortcuts
+        // Fetch educational shortcuts
         const shortcutsResponse = await fetch(
           "http://localhost:3000/entactivity/shortcut",
           {
@@ -79,33 +131,24 @@ export default function EntertainmentActivities() {
             },
           }
         );
-
         const shortcutsData = await shortcutsResponse.json();
-        console.log("Entertainment Shortcuts API Response:", shortcutsData);
 
-        if (Array.isArray(shortcutsData)) {
-          setShortcuts(
-            shortcutsData.map((shortcut) => ({
-              id: shortcut._id,
-              title: shortcut.title,
-              url: shortcut.url,
-            }))
-          );
+        if (
+          shortcutsData.eduShortcutLink &&
+          Array.isArray(shortcutsData.eduShortcutLink)
+        ) {
+          setShortcuts(shortcutsData.eduShortcutLink);
         } else {
-          console.error(
-            "Unexpected response for entertainment shortcuts:",
-            shortcutsData
-          );
+          // console.error("Unexpected shortcuts response format:", shortcutsData);
           setShortcuts([]);
         }
       } catch (err) {
-        console.error("Error fetching entertainment links and shortcuts:", err);
+        console.error("Error fetching educational links and shortcuts:", err);
       } finally {
         setIsLoading(false);
       }
     };
-
-    fetchEntLinksAndShortcuts();
+    fetchEntLinks();
   }, []);
 
   const handleAddShortcut = async (e) => {
@@ -140,9 +183,9 @@ export default function EntertainmentActivities() {
         setShortcuts((prevShortcuts) => [
           ...prevShortcuts,
           {
-            id: data.entShortcutLink.id,
-            title: data.entShortcutLink.title,
-            url: data.entShortcutLink.url,
+            id: data.entShortcutLink._id,
+            title: data.eentShortcutLink.title,
+            url: data.eentShortcutLink.url,
           },
         ]);
         setNewShortcutName("");
@@ -168,11 +211,16 @@ export default function EntertainmentActivities() {
       alert("You need to log in to delete tasks.");
       return;
     }
+
     const linkToDelete = shortcuts[index];
-    console.log(linkToDelete);
+    if (!linkToDelete || !linkToDelete._id) {
+      console.error("Shortcut ID is undefined:", linkToDelete);
+      return;
+    }
+
     try {
       const response = await fetch(
-        `http://localhost:3000/entactivity/shortcut/${linkToDelete.id}`,
+        `http://localhost:3000/entactivity/shortcut/${linkToDelete._id}`,
         {
           method: "DELETE",
           headers: {
@@ -180,21 +228,20 @@ export default function EntertainmentActivities() {
           },
         }
       );
-      console.log(response);
       if (response.ok) {
         setShortcuts(shortcuts.filter((_, i) => i !== index));
       }
     } catch (err) {
-      console.log("Error deleting the task", err);
+      console.error("Error deleting the shortcut", err);
     }
   };
-
   const handleAddLink = async (e) => {
     e.preventDefault();
     const token = getAuthToken();
+
     if (!token) {
       const valOk = confirm("You need to log in to view your links");
-      if (valOk === true) {
+      if (valOk) {
         navigate("/login");
       }
       return;
@@ -211,18 +258,15 @@ export default function EntertainmentActivities() {
       });
 
       const data = await response.json();
-      console.log(data);
 
-      if (response.ok && newLink.trim() && newLinkName.trim()) {
+      if (response.ok && data) {
+        // Update state with the new link
         setLinks((prevLinks) => [
           ...prevLinks,
-          {
-            id: data.entLink.id,
-            title: data.entLink.title,
-            url: data.entLink.url,
-          },
+          { id: data._id, title: data.title, url: data.url },
         ]);
 
+        // Clear input fields
         setNewLink("");
         setNewLinkName("");
         setShowInput(false);
@@ -231,6 +275,62 @@ export default function EntertainmentActivities() {
       }
     } catch (err) {
       console.error("Error adding link:", err);
+    }
+  };
+
+  const handleUpdateLink = async (id) => {
+    if (!updatedTitle.trim() || !updatedLink.trim()) {
+      alert("Please enter a valid title and link before saving.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:3000/entactivity/link/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            title: updatedTitle,
+            url: updatedLink,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update the entertainment link");
+      }
+
+      const data = await response.json();
+
+      // Ensure the updated object exists in response
+      if (!data.eduLink) {
+        alert("Unexpected response from server.");
+        return;
+      }
+
+      // Map through links and replace the updated one
+      const updatedLinks = links.map((link) =>
+        link.id === id
+          ? {
+              id: data.eduLink._id,
+              title: data.eduLink.title,
+              url: data.eduLink.url,
+            }
+          : link
+      );
+
+      setLinks(updatedLinks);
+      setToggleUpdate(false);
+      setUpdatedTitle("");
+      setUpdatedLink("");
+      alert("Link updated successfully!");
+    } catch (error) {
+      console.error("Error updating link:", error);
+      alert("Failed to update the educational link.");
     }
   };
 
@@ -245,6 +345,7 @@ export default function EntertainmentActivities() {
   };
   const handleCancelLinkForm = () => {
     setShowInput(false);
+    setToggleUpdate(false);
   };
 
   const handleDeleteLink = async (index) => {
@@ -283,13 +384,13 @@ export default function EntertainmentActivities() {
   //   if (file) {
   //     try {
   //       const compressedFile = await imageCompression(file, {
-  //         maxSizeMB: 0.1, // Maximum size in MB (adjust as needed)
-  //         maxWidthOrHeight: 100, // Resize dimensions
+  //         maxSizeMB: 0.1,
+  //         maxWidthOrHeight: 100,
   //         useWebWorker: true,
   //       });
   //       const reader = new FileReader();
   //       reader.onload = (event) => {
-  //         setNewShortcutIcon(event.target.result); // Store Base64 encoded compressed image
+  //         setNewShortcutIcon(event.target.result);
   //       };
   //       reader.readAsDataURL(compressedFile);
   //     } catch (error) {
@@ -297,6 +398,7 @@ export default function EntertainmentActivities() {
   //     }
   //   }
   // };
+
   if (isLoading) {
     return <div className="loading">Loading tasks...</div>;
   }
@@ -330,12 +432,13 @@ export default function EntertainmentActivities() {
             />
             <input
               type="text"
-              placeholder="Link name (e.g.'Funny Video')"
-              title="enter the link name (e.g.'Funny Video')"
+              placeholder="Link name (e.g.'JS tutorial')"
+              title="Enter the link name(e.g.'JS tutorial')"
               value={newLinkName}
               onChange={(e) => setNewLinkName(e.target.value)}
               required
             />
+
             <button type="submit" className="submit">
               Add
             </button>
@@ -348,6 +451,38 @@ export default function EntertainmentActivities() {
             </button>
           </form>
         )}
+
+        {toggleUpdate && (
+          <div className="todoInput">
+            <input
+              type="text"
+              placeholder="Enter the updated title"
+              className="textinput"
+              value={updatedTitle}
+              onChange={(e) => setUpdatedTitle(e.target.value)}
+              autoFocus
+            />
+            <input
+              type="url"
+              placeholder="Enter the updated URL"
+              className="textinput"
+              value={updatedLink}
+              onChange={(e) => setUpdatedLink(e.target.value)}
+            />
+            <button
+              className="submit"
+              onClick={() => handleUpdateLink(toggleUpdate)}
+            >
+              Save
+            </button>
+            <button
+              className="cancel_button"
+              onClick={() => setToggleUpdate(false)}
+            >
+              Cancel
+            </button>
+          </div>
+        )}
       </div>
 
       <ul className={`link_list ${showInput ? "linksblurred" : ""}`}>
@@ -358,21 +493,33 @@ export default function EntertainmentActivities() {
                 <span>
                   <PiVideoLight className="link_type_icon" />
                 </span>
-                <a href={link.url} target="_blank" rel="noopener noreferrer">
+                <span
+                  onClick={() => handleOpenLink(link.url)}
+                  className="clickable-link"
+                >
                   {link.title}
-                </a>
+                </span>
               </div>
-              <IoTrashBinOutline
-                className="delete_icon"
-                onClick={() => handleDeleteLink(index)}
-              />
+              <div className="link_feat_icons">
+                <FaRegEdit
+                  className="edit_icon"
+                  onClick={() => {
+                    setUpdatedTitle(link.title); // Pre-fill input fields
+                    setUpdatedLink(link.url);
+                    setToggleUpdate(link.id);
+                  }}
+                />
+                <IoTrashBinOutline
+                  className="delete_icon"
+                  onClick={() => handleDeleteLink(index)}
+                />{" "}
+              </div>
             </li>
           ))
         ) : (
           <p className="empty_message">No links added yet.</p>
         )}
       </ul>
-
       {/* <div className="add_link_style" onClick={handleShowInput}>
         {showInput ? (
           <MdOutlineBookmarkAdded className="addlinkicon" />

@@ -32,7 +32,55 @@ export default function EducationalActivities() {
 
   const [toggleUpdate, setToggleUpdate] = useState(false);
 
-  // fetching the list of links
+  const openWindows = new Map();
+
+  const handleOpenLink = (link) => {
+    const startTime = Date.now();
+    const newTab = window.open(link, "_blank");
+
+    if (!newTab) return;
+
+    console.log("start time: ", startTime);
+
+    openWindows.set(newTab, startTime);
+
+    const checkTabClosed = setInterval(() => {
+      if (newTab.closed) {
+        clearInterval(checkTabClosed);
+        const endTime = Date.now();
+        const timeSpent = Math.floor((endTime - startTime) / 1000);
+
+        console.log("end time", timeSpent);
+        if (timeSpent > 0) {
+          sendTimeToBackend(link, timeSpent);
+        }
+
+        openWindows.delete(newTab);
+      }
+    }, 1000);
+  };
+
+  const sendTimeToBackend = async (link, timeSpent) => {
+    // Removed title since it's not needed
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const response = await fetch("http://localhost:3000/eduactivity/link", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ title: link, url: link, timeSpent }), // ✅ Correct mapping
+      });
+
+      const data = await response.json();
+      console.log("Time recorded:", data);
+    } catch (error) {
+      console.error("Error sending time:", error);
+    }
+  };
 
   const getAuthToken = () => {
     return localStorage.getItem("token");
@@ -59,6 +107,7 @@ export default function EducationalActivities() {
           }
         );
         const linksData = await linksResponse.json();
+        console.log("Links Data:", linksData);
 
         if (Array.isArray(linksData)) {
           const mappedEduLinks = linksData.map((link) => ({
@@ -89,7 +138,7 @@ export default function EducationalActivities() {
         ) {
           setShortcuts(shortcutsData.eduShortcutLink);
         } else {
-          console.error("Unexpected shortcuts response format:", shortcutsData);
+          // console.error("Unexpected shortcuts response format:", shortcutsData);
           setShortcuts([]);
         }
       } catch (err) {
@@ -445,15 +494,18 @@ export default function EducationalActivities() {
                   <span>
                     <BiBookAlt className="link_type_icon" />
                   </span>
-                  <a href={link.url} target="_blank" rel="noopener noreferrer">
+                  <span
+                    onClick={() => handleOpenLink(link.url)}
+                    className="clickable-link"
+                  >
                     {link.title}
-                  </a>
+                  </span>
                 </div>
                 <div className="link_feat_icons">
                   <FaRegEdit
                     className="edit_icon"
                     onClick={() => {
-                      setUpdatedTitle(link.title); // Pre-fill input fields
+                      setUpdatedTitle(link.title);
                       setUpdatedLink(link.url);
                       setToggleUpdate(link.id);
                     }}

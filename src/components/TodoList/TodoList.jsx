@@ -284,7 +284,6 @@ function TodoList() {
       ) : (
         <ul
           className={`task_list ${todoinput || toggleUpdate ? "blurred" : ""}`}
-          key={tasks}
         >
           {tasks.map((task, index) => (
             <>

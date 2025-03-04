@@ -1,79 +1,90 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import "./RecordedTime.css";
 import { BiBookAlt } from "react-icons/bi";
-import { PiVideoBold } from "react-icons/pi";
-import "../../../../styles/recordedtime.css";
+import { PiVideoLight } from "react-icons/pi";
 
-function RecordedTime() {
-  const [studyTime, setStudyTime] = useState(0); // Time in minutes
+const RecordedTime = () => {
+  const [studyTime, setStudyTime] = useState(0);
   const [entertainmentTime, setEntertainmentTime] = useState(0);
-  // const [isTracking, setIsTracking] = useState(false);
 
-  // Load time from localStorage when component mounts
+  // Function to fetch recorded times from the backend
+  const fetchRecordedTimes = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const studyResponse = await fetch(
+        "http://localhost:3000/eduactivity/link",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const entResponse = await fetch(
+        "http://localhost:3000/entactivity/link",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const studyData = await studyResponse.json();
+      const entData = await entResponse.json();
+
+      if (Array.isArray(studyData)) {
+        setStudyTime(
+          studyData.reduce((sum, record) => sum + record.timeSpent, 0)
+        );
+      }
+      if (Array.isArray(entData)) {
+        setEntertainmentTime(
+          entData.reduce((sum, record) => sum + record.timeSpent, 0)
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching recorded time:", error);
+    }
+  };
+
   useEffect(() => {
-    const savedStudyTime = localStorage.getItem("studyTime");
-    const savedEntertainmentTime = localStorage.getItem("entertainmentTime");
-
-    if (savedStudyTime) setStudyTime(parseInt(savedStudyTime, 10));
-    if (savedEntertainmentTime)
-      setEntertainmentTime(parseInt(savedEntertainmentTime, 10));
+    fetchRecordedTimes();
   }, []);
 
-  // Function to start tracking time
-  // function startTracking() {
-  //   setIsTracking(true);
-  // }
-
-  // Increment the time every minute
-  useEffect(() => {
-    // if (!isTracking) return;
-
-    const interval = setInterval(() => {
-      setStudyTime((prevTime) => {
-        const newTime = prevTime + 1;
-        localStorage.setItem("studyTime", newTime); // Save progress
-        return newTime;
-      });
-
-      setEntertainmentTime((prevTime) => {
-        const newTime = prevTime + 1;
-        localStorage.setItem("entertainmentTime", newTime); // Save progress
-        return newTime;
-      });
-    }, 60000); // Update every 60 seconds
-
-    return () => clearInterval(interval); // Cleanup on unmount
-  });
-
-  // Format minutes to "Xh Ym"
-  function formatTime(minutes) {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours}h ${mins}min`;
-  }
+  // Function to format time (seconds to hours & minutes)
+  const formatTime = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return `${hours > 0 ? hours + "h " : ""}${minutes}min`;
+  };
 
   return (
-    <div className="recordedtime_container">
-      <div className="time_tab">
-        <div className="timer_label">
-          <h4>Study Time</h4>
-          <BiBookAlt />
+    <div className="recorded-time-container">
+      <div className="timing-box">
+        <div className="time_label">
+          <p>Study Time </p>
+          <span className="recorded_icon">
+            <BiBookAlt />
+          </span>
         </div>
         <p>{formatTime(studyTime)}</p>
       </div>
-
-      <div className="time_tab">
-        <div className="timer_label">
-          <h4>Entertainment Time</h4>
-          <PiVideoBold />
+      <div className="timing-box">
+        <div className="time_label">
+          <p>Entertainment Time </p>
+          <span className="recorded_icon">
+            <PiVideoLight />
+          </span>
         </div>
         <p>{formatTime(entertainmentTime)}</p>
       </div>
-
-      {/* <button onClick={startTracking} className="start-btn">
-        Start Tracking
-      </button> */}
     </div>
   );
-}
+};
 
 export default RecordedTime;
