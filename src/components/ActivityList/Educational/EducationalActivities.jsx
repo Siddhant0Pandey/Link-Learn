@@ -9,6 +9,8 @@ import { BiBookAlt } from "react-icons/bi";
 // import imageCompression from "browser-image-compression";
 import { useNavigate } from "react-router-dom";
 import { FaRegEdit } from "react-icons/fa";
+import { useContext } from "react";
+import { ThemeContext } from "../../../context/ThemeContext.jsx";
 
 export default function EducationalActivities() {
   const [links, setLinks] = useState([]);
@@ -26,13 +28,13 @@ export default function EducationalActivities() {
 
   const navigate = useNavigate();
 
-  //update the links
   const [updatedLink, setUpdatedLink] = useState("");
   const [updatedTitle, setUpdatedTitle] = useState("");
 
   const [toggleUpdate, setToggleUpdate] = useState(false);
 
   const openWindows = new Map();
+  const { updateTimeSpent } = useContext(ThemeContext);
 
   const handleOpenLink = (link) => {
     const startTime = Date.now();
@@ -40,28 +42,33 @@ export default function EducationalActivities() {
 
     if (!newTab) return;
 
-    console.log("start time: ", startTime);
+    console.log("Start time:", startTime);
+    openWindows.set(link, startTime);
 
-    openWindows.set(newTab, startTime);
-
-    const checkTabClosed = setInterval(() => {
-      if (newTab.closed) {
-        clearInterval(checkTabClosed);
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible" && openWindows.has(link)) {
         const endTime = Date.now();
-        const timeSpent = Math.floor((endTime - startTime) / 1000);
+        const sessionTimeSpent = Math.floor(
+          (endTime - openWindows.get(link)) / 1000
+        );
 
-        console.log("end time", timeSpent);
-        if (timeSpent > 0) {
-          sendTimeToBackend(link, timeSpent);
+        if (sessionTimeSpent > 0) {
+          updateTimeSpent(sessionTimeSpent);
+          sendTimeToBackend(link, sessionTimeSpent);
         }
 
-        openWindows.delete(newTab);
+        openWindows.delete(link);
+        document.removeEventListener(
+          "visibilitychange",
+          handleVisibilityChange
+        );
       }
-    }, 1000);
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
   };
 
   const sendTimeToBackend = async (link, timeSpent) => {
-    // Removed title since it's not needed
     const token = localStorage.getItem("token");
     if (!token) return;
 
@@ -72,7 +79,7 @@ export default function EducationalActivities() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ title: link, url: link, timeSpent }), // ✅ Correct mapping
+        body: JSON.stringify({ title: link, url: link, timeSpent }),
       });
 
       const data = await response.json();
@@ -97,7 +104,6 @@ export default function EducationalActivities() {
         return;
       }
       try {
-        // Fetch educational links
         const linksResponse = await fetch(
           "http://localhost:3000/eduactivity/link",
           {
@@ -131,15 +137,14 @@ export default function EducationalActivities() {
           }
         );
         const shortcutsData = await shortcutsResponse.json();
+        console.log("Shortcuts Data Response:", shortcutsData);
 
-        if (
-          shortcutsData.eduShortcutLink &&
-          Array.isArray(shortcutsData.eduShortcutLink)
-        ) {
-          setShortcuts(shortcutsData.eduShortcutLink);
+        // ✅ FIX: Directly check if the response is an array
+        if (Array.isArray(shortcutsData)) {
+          setShortcuts(shortcutsData); // Set it directly if it's an array
         } else {
-          // console.error("Unexpected shortcuts response format:", shortcutsData);
-          setShortcuts([]);
+          console.error("Unexpected shortcuts response format:", shortcutsData);
+          setShortcuts([]); // Set empty array if format is incorrect
         }
       } catch (err) {
         console.error("Error fetching educational links and shortcuts:", err);

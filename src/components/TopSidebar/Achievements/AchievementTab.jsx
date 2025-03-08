@@ -15,7 +15,10 @@ function AchievementTab() {
           </div>
           <div className="achievementText">
             <strong>Educational Enthusiast</strong>
-            <p>Spend 3 hours in educational activities</p>
+            <p>Spend 20 seconds in educational activities</p>
+            <p className="rewardlabel">
+              <em>Unlocks Dark Theme</em>
+            </p>
           </div>
         </div>
 
@@ -24,8 +27,11 @@ function AchievementTab() {
             <SiApostrophe />
           </div>
           <div className="achievementText">
-            <strong>Entertainment Explorer</strong>
-            <p>Spend 2 hours in entertainment activities</p>
+            <strong>Enlightment Explorer</strong>
+            <p>Spend 5 minutes in educational activities</p>
+            <p className="rewardlabel">
+              <em>Unlocks Pastel Theme</em>
+            </p>
           </div>
         </div>
       </div>

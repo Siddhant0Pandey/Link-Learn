@@ -52,3 +52,9 @@
   font-size: small;
   line-height: 32px;
 }
+
+.rewardlabel {
+  padding: 0.3rem 0;
+  color: var(--accent);
+  font-weight: bold;
+}

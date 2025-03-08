@@ -8,7 +8,6 @@ export default function Activities() {
 
   return (
     <div className="activities_container">
-      {/* Tabs */}
       <div className="tabs">
         <button
           className={`${
@@ -28,7 +27,6 @@ export default function Activities() {
         </button>
       </div>
 
-      {/* Tab Content */}
       <div className="tab_content">
         {activeTab === "educational" ? (
           <EducationalActivities />

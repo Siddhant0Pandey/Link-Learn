@@ -72,7 +72,7 @@ export default function EntertainmentActivities() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ title: link, url: link, timeSpent }), // ✅ Correct mapping
+        body: JSON.stringify({ title: link, url: link, timeSpent }),
       });
 
       const data = await response.json();
@@ -175,26 +175,33 @@ export default function EntertainmentActivities() {
           body: JSON.stringify({ title: newShortcutName, url: newShortcutURL }),
         }
       );
-
       const data = await response.json();
-      console.log(data);
+      console.log("Shortcut Response Data:", data);
 
       if (response.ok && newShortcutURL.trim() && newShortcutName.trim()) {
-        setShortcuts((prevShortcuts) => [
-          ...prevShortcuts,
-          {
-            id: data.entShortcutLink._id,
-            title: data.eentShortcutLink.title,
-            url: data.eentShortcutLink.url,
-          },
-        ]);
+        if (data.entShortcutLink) {
+          setShortcuts((prevShortcuts) => [
+            ...prevShortcuts,
+            {
+              id: data.entShortcutLink.id,
+              title: data.entShortcutLink.title,
+              url: data.entShortcutLink.url,
+            },
+          ]);
+        } else {
+          console.error("Missing entShortcutLink in response:", data);
+          alert(
+            "Unexpected error: entShortcutLink is missing in the response."
+          );
+        }
+
         setNewShortcutName("");
         setNewShortcutURL("");
         setShowShortcutForm(false);
       } else {
         console.error(
           "Failed to add shortcut:",
-          data.message || "entShortcutLink is missing"
+          data.message || "Unexpected error"
         );
         alert(
           data.message || "Unexpected error occurred while adding the shortcut."
